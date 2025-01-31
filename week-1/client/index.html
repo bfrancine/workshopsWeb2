@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Week 1 - Consume API</title>
+  <script>
+    const completed = (response) => {
+      const data = JSON.parse(response.target.responseText);
+      
+      let resultType = "";
+      if(data.TipoCompraDolares){
+        resultType +=`Dolares -  Compra: ${data.TipoCompraDolares}, Venta: ${data.TipoVentaDolares}<br>`;
+      } 
+      if(data.TipoCompraEuros){
+        resultType += `Euros - Compra: ${data.TipoCompraEuros}, Venta: ${data.TipoVentaEuros}<br>`;
+      }
+      document.getElementById('result').innerHTML = resultType;
+    };
+
+    const error = () => console.log(this.responseText);
+
+    function getExchange(type) {
+      const ajaxRequest = new XMLHttpRequest(); //AJAX
+      ajaxRequest.addEventListener("load", completed);
+      ajaxRequest.addEventListener("error", error);
+      ajaxRequest.open("GET", `http://localhost:3001/tipocambio?type=${type}`);
+      ajaxRequest.send();
+    }
+  </script>
+</head>
+
+<body>
+  <button onclick="getExchange('usd');">Dolares</button>
+  <button onclick="getExchange('eur');">Euros</button>
+  <button onclick="getExchange('');">Ver ambos</button>
+
+  <h3>Results:</h3>
+  <div id="result"></div>
+
+</body>
+
+</html>
