@@ -126,9 +126,20 @@ const teacherDelete = (req, res) => {
   }
 };
 
+const teacherGetAll = async (req, res) => {
+  try {
+    const teachers = await Teacher.find(); // Obtener todos los profesores desde la base de datos
+    res.json(teachers); // Enviar la respuesta con la lista de profesores
+  } catch (err) {
+    res.status(500).json({ error: 'Error al obtener los profesores' });
+  }
+};
+
+
 module.exports = {
   teacherCreate,
   teacherGet,
   teacherDelete,
-  teacherPut
+  teacherPut,
+  teacherGetAll
 };

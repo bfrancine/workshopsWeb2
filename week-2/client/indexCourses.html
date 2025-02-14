@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulario de Curso</title>
+</head>
+<body>
+
+  <h1>Crear un Curso</h1>
+  
+  <form id="courseForm" method="POST" action="/course">
+    <label for="name">Nombre del curso:</label>
+    <input type="text" id="name" name="name" required>
+    <br><br>
+    
+    <label for="credits">Créditos:</label>
+    <input type="number" id="credits" name="credits" required min="1">
+    <br><br>
+    
+    <label for="teacher">Profesor:</label>
+    <select id="teacher" name="teacher" required>
+      <!-- Las opciones se llenarán dinámicamente -->
+    </select>
+    <br><br>
+    
+    <button type="submit">Crear Curso</button>
+  </form>
+
+  <script>
+    // Función para obtener los profesores desde el backend
+    async function loadTeachers() {
+      const response = await fetch('http://localhost:3001/teachers'); // Este es el endpoint para obtener los profesores
+      const teachers = await response.json();
+      const teacherSelect = document.getElementById('teacher');
+      
+      // Añadir una opción por defecto
+      const defaultOption = document.createElement('option');
+      defaultOption.value = "";
+      defaultOption.text = "Selecciona un profesor";
+      teacherSelect.appendChild(defaultOption);
+      
+      // Rellenar el dropdown con los profesores
+      teachers.forEach(teacher => {
+        const option = document.createElement('option');
+        option.value = teacher._id; // El ID del profesor
+        option.text = teacher.first_name + " " + teacher.last_name; // El nombre completo del profesor
+        teacherSelect.appendChild(option);
+      });
+    }
+
+    // Cargar los profesores cuando la página se haya cargado
+    window.onload = loadTeachers;
+
+    // Enviar los datos del formulario sin recargar la página
+    document.getElementById("courseForm").addEventListener("submit", async function (event) {
+      event.preventDefault(); // Evita que el formulario se envíe de forma tradicional
+
+      const formData = new FormData(this); // Obtiene los datos del formulario
+      const data = {
+        name: formData.get("name"),
+        credits: formData.get("credits"),
+        teacher: formData.get("teacher")
+      };
+
+      try {
+        const response = await fetch('http://localhost:3001/course', { // Aquí se hace la solicitud a la API
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data), // Los datos del formulario
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          console.log("Curso creado", result);
+          // Aquí puedes redirigir o mostrar un mensaje de éxito.
+          alert("Curso creado con éxito.");
+        } else {
+          console.error("Error al crear el curso");
+          alert("Error al crear el curso.");
+        }
+      } catch (error) {
+        console.error("Error en la solicitud:", error);
+        alert("Hubo un error en la solicitud.");
+      }
+    });
+  </script>
+
+</body>
+</html>
+
